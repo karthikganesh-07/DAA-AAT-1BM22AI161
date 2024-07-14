@@ -1,0 +1,60 @@
+def maximumPeople(pops, tloc, cloc, crng):
+    evts = {}
+    ntwn = len(pops)
+    ncld = len(cloc)
+
+    for i in range(ntwn):
+        if tloc[i] in evts:
+            evts[tloc[i]].append((2, pops[i]))
+        else:
+            evts[tloc[i]] = [(2, pops[i])]
+
+    for i in range(ncld):
+        cstr = cloc[i] - crng[i]
+        cend = cloc[i] + crng[i] + 1
+
+        if cstr in evts:
+            evts[cstr].append((1, i + 1))
+        else:
+            evts[cstr] = [(1, i + 1)]
+
+        if cend in evts:
+            evts[cend].append((-1, i + 1))
+        else:
+            evts[cend] = [(-1, i + 1)]
+
+    suny = 0
+    actv = set()
+    cvrd = [0] * (ncld + 1)
+
+    for cord in sorted(evts.keys()):
+        elst = evts[cord]
+        elst.sort()
+
+        for etyp, eval in elst:
+            if etyp == -1:
+                actv.discard(eval)
+            elif etyp == 1:
+                actv.add(eval)
+            else:
+                if len(actv) == 1:
+                    cvrd[list(actv)[0]] += eval
+                elif len(actv) == 0:
+                    suny += eval
+
+    maxr = max(cvrd)
+    return suny + maxr
+
+if __name__ == '__main__':
+    import sys
+    inpt = sys.stdin.read
+    data = inpt().split()
+    ntwn = int(data[0])
+    pops = list(map(int, data[1:ntwn+1]))
+    tloc = list(map(int, data[ntwn+1:2*ntwn+1]))
+    ncld = int(data[2*ntwn+1])
+    cloc = list(map(int, data[2*ntwn+2:2*ntwn+2+ncld]))
+    crng = list(map(int, data[2*ntwn+2+ncld:]))
+
+    rslt = maximumPeople(pops, tloc, cloc, crng)
+    print(rslt)
